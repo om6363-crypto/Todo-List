@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import TaskForm from './components/TaskForm';
+import TaskList from './components/TaskList';
+import './style.css';
 
-function App() {
+const App = () => {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    const SaveTasks = JSON.parse(localStorage.getItem('tasks'));
+    if (SaveTasks){
+      setTasks(SaveTasks);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tasks.length>0){
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+  }, [tasks]);
+
+  const addTask = (task) => {
+    setTasks([...tasks, task]);
+  };
+
+  const toggleComp = (id) => {
+    setTasks(
+      tasks.map(task => 
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const delTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Task Manager</h1>
+      <TaskForm addTask={addTask} />
+      <TaskList tasks={tasks} toggleComp={toggleComp} delTask={delTask} />
     </div>
   );
-}
+};
 
 export default App;
