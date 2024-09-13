@@ -4,42 +4,40 @@ import TaskList from './components/TaskList';
 import './style.css';
 
 const App = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const storedTasks = JSON.parse(localStorage.getItem('tasks'));
+    return storedTasks ? storedTasks : [];
+  });
 
   useEffect(() => {
-    const SaveTasks = JSON.parse(localStorage.getItem('tasks'));
-    if (SaveTasks){
-      setTasks(SaveTasks);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (tasks.length>0){
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
 
   const addTask = (task) => {
     setTasks([...tasks, task]);
   };
 
-  const toggleComp = (id) => {
+  const toggleComp = (taskId) => {
     setTasks(
-      tasks.map(task => 
-        task.id === id ? { ...task, completed: !task.completed } : task
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
       )
     );
   };
 
-  const delTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const delTask = (taskId) => {
+    setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
   return (
-    <div>
+    <div className="app">
       <h1>Task Manager</h1>
       <TaskForm addTask={addTask} />
-      <TaskList tasks={tasks} toggleComp={toggleComp} delTask={delTask} />
+      <TaskList
+        tasks={tasks}
+        toggleComp={toggleComp}
+        delTask={delTask}
+      />
     </div>
   );
 };
